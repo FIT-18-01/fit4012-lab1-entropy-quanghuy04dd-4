@@ -20,10 +20,18 @@ for rel in required_files:
     if not (root / rel).exists():
         errors.append(f'Thieu file bat buoc: {rel}')
 
+# Early exit for missing required files (cannot proceed without them)
 if errors:
     for e in errors:
         print(f'::error::{e}')
-    sys.exit(1)
+    # Output score 0 for missing files
+    import os
+    github_output = os.environ.get('GITHUB_OUTPUT')
+    if github_output:
+        with open(github_output, 'a') as f:
+            f.write('score=0\n')
+            f.write('max_score=10\n')
+    sys.exit(0)
 
 entropy_code = (root / 'src/entropy_redundancy.cpp').read_text(encoding='utf-8')
 modinv_code = (root / 'src/mod_inverse.cpp').read_text(encoding='utf-8')
@@ -86,9 +94,31 @@ except Exception as exc:
 for w in warnings:
     print(f'::warning::{w}')
 
+import os
+
+# Determine score
+if errors:
+    score = 0
+else:
+    score = 10
+
+max_score = 10
+
+# Output score for GitHub Actions autograding
+# Use GITHUB_OUTPUT env file (new method) and legacy ::set-output (old method)
+github_output = os.environ.get('GITHUB_OUTPUT')
+if github_output:
+    with open(github_output, 'a') as f:
+        f.write(f'score={score}\n')
+        f.write(f'max_score={max_score}\n')
+else:
+    print(f'::set-output name=score::{score}')
+    print(f'::set-output name=max_score::{max_score}')
+
 if errors:
     for e in errors:
         print(f'::error::{e}')
-    sys.exit(1)
+    # Exit 0 so the workflow completes and reporter can process the score
+    sys.exit(0)
 
-print('::notice::FIT4012 Buổi 2 auto check passed.')
+print(f'::notice::FIT4012 Buổi 2 auto check passed. Score: {score}/{max_score}')
