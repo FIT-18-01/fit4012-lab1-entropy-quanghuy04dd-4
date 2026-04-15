@@ -23,7 +23,7 @@ double calculate_entropy(const string &text) {
     return entropy;
 }
 
-double calculate_redundancy(const string &text, int alphabet_size) {
+double calculate_redundancy(const string &text, int alphabet_size = 256) {
     if (text.empty() || alphabet_size <= 1) {
         return 0.0;
     }
@@ -40,7 +40,7 @@ int main() {
     getline(cin, input);
 
     double entropy = calculate_entropy(input);
-    double redundancy = calculate_redundancy(input);
+    double redundancy = calculate_redundancy(input, 256);
 
     cout << "Entropy: " << entropy << '\n';
     cout << "Redundancy: " << redundancy << '\n';
