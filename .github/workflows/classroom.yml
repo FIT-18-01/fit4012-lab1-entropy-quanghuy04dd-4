@@ -13,6 +13,16 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+    - name: Install g++
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y g++
     - name: check-tests-and-logs
       id: check-tests-and-logs
       uses: classroom-resources/autograding-command-grader@v1
